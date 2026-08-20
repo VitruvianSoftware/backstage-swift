@@ -1,0 +1,12 @@
+# Backstage catalog-info.yaml
+# This file registers the Template itself in Backstage's catalog
+# See https://backstage.io/docs/features/software-templates/
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: swift-generated-blueprint
+  description: Aspect Workflows Bazel Monorepo Templates
+spec:
+  type: url
+  targets:
+    - ./template.yaml
