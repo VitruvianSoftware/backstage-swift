@@ -1,0 +1,461 @@
+# Copyright 2026 MyProject
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: bazel-swift
+  title: Bazel Swift Monorepo Template
+  description: Bazel monorepo for Swift projects
+  tags:
+    - bazel
+    - aspect-workflows
+    - monorepo
+    - swift
+  links:
+    - url: https://github.com/VitruvianSoftware/backstage-swift
+      title: Source
+      icon: github
+    - url: https://github.com/aspect-build/aspect-cli
+      title: Aspect CLI
+      icon: github
+    - url: https://docs.aspect.build/
+      title: Documentation
+      icon: docs
+
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Project Information
+      required:
+        - name
+        - owner
+      properties:
+        name:
+          title: Project Name
+          type: string
+          description: Unique name for your project (will be used for repository name)
+          pattern: '^[a-z0-9-]+$'
+          ui:autofocus: true
+          ui:options:
+            rows: 1
+        description:
+          title: Description
+          type: string
+          description: A brief description of your project
+          ui:options:
+            rows: 3
+        owner:
+          title: Owner
+          type: string
+          description: Team or user who owns this project
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: [Group, User]
+            # allowedKinds:
+            #   - Group
+            #   - User
+        # wifProjectNumber:
+        #   title: What is the Workload identity project number?
+        #   type: string
+        #   ui:hint: Get the project number by running gcloud projects list --filter="PROJECT_ID=[your-project-id]" --format="value(PROJECT_NUMBER)"
+        # wifPoolName:
+        #   title: What is your workload identity pool name?
+        #   type: string
+        # wifProviderName:
+        #  title: what is your Workload Identity provider name?
+        #  type: string
+        # wifServiceAccount:
+        #   title: what is the service account that can be used to federate to the WIF pool?
+        #   type: string
+    # - title: Setup your Artifact registry repository
+    #   properties:
+    #     arRepo:
+    #       title: Enter the Artifact registry repository name
+    #       type: string
+    #     arLocation:
+    #       title: Enter the Artifact registry location
+    #       type: string
+    #       default: us
+    #       enum:
+    #       - us
+    #       - europe
+    #       - asia
+    #       - us-west1
+    #       - us-west2
+    #       - us-west3
+    #       - us-west4
+    #       - us-central1
+    #       - us-east1
+    #       - us-east4
+    #       - us-east5
+    #       - us-south1
+    #       - northamerica-northeast1
+    #       - northamerica-northeast2
+    #       - southamerica-west1
+    #       - southamerica-east1
+    #       - europe-west2
+    #       - europe-west1
+    #       - europe-west4
+    #       - europe-west6
+    #       - europe-west3
+    #       - europe-north1
+    #       - europe-central2
+    #       - europe-west8
+    #       - europe-southwest1
+    #       - europe-west9
+    #       - europe-west12
+    #       - europe-west10
+    #       - asia-south1
+    #       - asia-southeast1
+    #       - asia-southeast2
+    #       - asia-east2
+    #       - asia-east1
+    #       - asia-northeast1
+    #       - asia-northeast2
+    #       - australia-southeast1
+    #       - australia-southeast2
+    #       - asia-northeast3
+    #       - me-west1
+    #       - me-central1
+    #       - me-central2
+    #       - africa-south1
+    #       enumNames:
+    #       - 'US Multi-region (us)'
+    #       - 'Europe Multi-region (europe)'
+    #       - 'Asia Multi-region (asia)'
+    #       - 'Oregon (us-west1)'
+    #       - 'Los Angeles (us-west2)'
+    #       - 'Salt Lake City (us-west3)'
+    #       - 'Las Vegas (us-west4)'
+    #       - 'Iowa (us-central1)'
+    #       - 'South Carolina (us-east1)'
+    #       - 'N. Virginia (us-east4)'
+    #       - 'Columbus (us-east5)'
+    #       - 'Dallas (us-south1)'
+    #       - 'Montréal (northamerica-northeast1)'
+    #       - 'Toronto (northamerica-northeast2)'
+    #       - 'Santiago (southamerica-west1)'
+    #       - 'São Paulo (southamerica-east1)'
+    #       - 'London (europe-west2)'
+    #       - 'Belgium (europe-west1)'
+    #       - 'Netherlands (europe-west4)'
+    #       - 'Zurich (europe-west6)'
+    #       - 'Frankfurt (europe-west3)'
+    #       - 'Finland (europe-north1)'
+    #       - 'Warsaw (europe-central2)'
+    #       - 'Milan (europe-west8)'
+    #       - 'Madrid (europe-southwest1)'
+    #       - 'Paris (europe-west9)'
+    #       - 'Turin (europe-west12)'
+    #       - 'Berlin (europe-west10)'
+    #       - 'Mumbai (asia-south1)'
+    #       - 'Singapore (asia-southeast1)'
+    #       - 'Jakarta (asia-southeast2)'
+    #       - 'Hong Kong (asia-east2)'
+    #       - 'Taiwan (asia-east1)'
+    #       - 'Tokyo (asia-northeast1)'
+    #       - 'Osaka (asia-northeast2)'
+    #       - 'Sydney (australia-southeast1)'
+    #       - 'Melbourne (australia-southeast2)'
+    #       - 'Seoul (asia-northeast3)'
+    #       - 'Tel Aviv (me-west1)'
+    #       - 'Doha (me-central1)'
+    #       - 'Dammam 7 (me-central2)'
+    #       - 'Johannesburg (africa-south1)'
+    # - title: Setup your Cloud Run service
+    #   properties:
+    #     gcpProjectId:
+    #       title: GCP Project ID
+    #       type: string
+    #       description: Enter the GCP project ID that you wish to deploy cloud run to
+    #       pattern: ^[a-z][a-z0-9-]{4,28}[a-z0-9]$
+    #     serviceName:
+    #       title: Service Name
+    #       type: string
+    #       description: Unique name of the new service
+    #       maxLength: 25
+    #       pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+    #     serviceDescription:
+    #       title: Describe your service
+    #       type: string
+    #       ui:placeholder: My hello world application
+    #     region:
+    #       title: Select the GCP region where you wish to host this Cloud Run service.
+    #       type: string
+    #       default: us-central1
+    #       enum:
+    #         - us-west1
+    #         - us-west2
+    #         - us-west3
+    #         - us-west4
+    #         - us-central1
+    #         - us-east1
+    #         - us-east4
+    #         - us-east5
+    #         - us-south1
+    #         - northamerica-northeast1
+    #         - northamerica-northeast2
+    #         - southamerica-west1
+    #         - southamerica-east1
+    #         - europe-west2
+    #         - europe-west1
+    #         - europe-west4
+    #         - europe-west6
+    #         - europe-west3
+    #         - europe-north1
+    #         - europe-central2
+    #         - europe-west8
+    #         - europe-southwest1
+    #         - europe-west9
+    #         - europe-west12
+    #         - europe-west10
+    #         - asia-south1
+    #         - asia-southeast1
+    #         - asia-southeast2
+    #         - asia-east2
+    #         - asia-east1
+    #         - asia-northeast1
+    #         - asia-northeast2
+    #         - australia-southeast1
+    #         - australia-southeast2
+    #         - asia-northeast3
+    #         - me-west1
+    #         - me-central1
+    #         - me-central2
+    #         - africa-south1
+    #       enumNames:
+    #         - 'Oregon (us-west1)'
+    #         - 'Los Angeles (us-west2)'
+    #         - 'Salt Lake City (us-west3)'
+    #         - 'Las Vegas (us-west4)'
+    #         - 'Iowa (us-central1)'
+    #         - 'South Carolina (us-east1)'
+    #         - 'N. Virginia (us-east4)'
+    #         - 'Columbus (us-east5)'
+    #         - 'Dallas (us-south1)'
+    #         - 'Montréal (northamerica-northeast1)'
+    #         - 'Toronto (northamerica-northeast2)'
+    #         - 'Santiago (southamerica-west1)'
+    #         - 'São Paulo (southamerica-east1)'
+    #         - 'London (europe-west2)'
+    #         - 'Belgium (europe-west1)'
+    #         - 'Netherlands (europe-west4)'
+    #         - 'Zurich (europe-west6)'
+    #         - 'Frankfurt (europe-west3)'
+    #         - 'Finland (europe-north1)'
+    #         - 'Warsaw (europe-central2)'
+    #         - 'Milan (europe-west8)'
+    #         - 'Madrid (europe-southwest1)'
+    #         - 'Paris (europe-west9)'
+    #         - 'Turin (europe-west12)'
+    #         - 'Berlin (europe-west10)'
+    #         - 'Mumbai (asia-south1)'
+    #         - 'Singapore (asia-southeast1)'
+    #         - 'Jakarta (asia-southeast2)'
+    #         - 'Hong Kong (asia-east2)'
+    #         - 'Taiwan (asia-east1)'
+    #         - 'Tokyo (asia-northeast1)'
+    #         - 'Osaka (asia-northeast2)'
+    #         - 'Sydney (australia-southeast1)'
+    #         - 'Melbourne (australia-southeast2)'
+    #         - 'Seoul (asia-northeast3)'
+    #         - 'Tel Aviv (me-west1)'
+    #         - 'Doha (me-central1)'
+    #         - 'Dammam 7 (me-central2)'
+    #         - 'Johannesburg (africa-south1)'
+
+    #     ingress:
+    #       type: string
+    #       title: select the ingress setting for Cloud Run.
+    #       default: all
+    #       enum:
+    #         - all
+    #         - internal-and-cloud-load-balancing
+    #         - internal
+    #       enumNames:
+    #         - All
+    #         - Internal and Cloud Load Balancing
+    #         - Internal
+
+    - title: Repository Configuration
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+               - github.com
+            requestUserCredentials:
+              secrets:
+                - USER_OAUTH_TOKEN
+            # Here's the option you can pass to the RepoUrlPicker
+            # requestUserCredentials:
+            #   secretsKey: USER_OAUTH_TOKEN
+            #   additionalScopes:
+            #     github:
+            #       - workflow:write
+            #       - repo
+    - title: Features
+      properties:
+        enableStamping:
+          title: Enable Version Stamping
+          type: boolean
+          description: Setup version stamping for releases
+          default: false
+        enableOCI:
+          title: Enable OCI Containers
+          type: boolean
+          description: Setup OCI container builds with rules_oci
+          default: false
+        enableCodegen:
+          title: Enable Code Generation Tools
+          type: boolean
+          description: Install copier (Python), yeoman (JS), and scaffold (Go)
+          default: false
+
+###############################################################################
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        # tools/initializer/ is the application initializer engine: a jinja2
+        # TEMPLATE tree, not source. Its files carry placeholders that
+        # `aspect render-app` substitutes LATER, from inside the scaffolded
+        # repo. fetch:template Nunjucks-renders skeleton/** right now, and
+        # Nunjucks renders an undefined name as the empty string -- so without
+        # this the engine would arrive with every placeholder erased.
+        #
+        # copyWithoutTemplating copies matched files' CONTENTS verbatim; paths
+        # are still rendered, which is fine because no path under
+        # tools/initializer/ contains a placeholder. It is the key the action
+        # actually reads: @backstage/plugin-scaffolder-backend 4.0.2 still
+        # accepts the deprecated copyWithoutRender in its input schema but
+        # never looks at it (see resolveTemplateActionSettings in
+        # dist/scaffolder/actions/builtin/fetch/templateActionHandler.cjs.js).
+        copyWithoutTemplating:
+          - 'tools/initializer/**'
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+          languages:
+            - Swift
+          enableStamping: ${{ parameters.enableStamping }}
+          enableOCI: ${{ parameters.enableOCI }}
+          enableCodegen: ${{ parameters.enableCodegen }}
+
+    # - id: fetchWorkflows
+    #   name: Install Github Workflows
+    #   action: fetch:plain
+    #   input:
+    #     url: ./cloud-run-workflows
+    #     targetPath: ./code
+
+    - id: publish
+      name: Create GitHub repo
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+        repoVisibility: private
+        # token: ${{ secrets.USER_OAUTH_TOKEN }}
+        deleteBranchOnMerge: true
+        gitCommitMessage: "Initial commit from Aspect Workflows template"
+
+    # - id: publish
+    #   name: Create GitHub repo
+    #   action: publish:github
+    #   input:
+    #     repoUrl: ${{ parameters.repoUrl }}
+    #     description: Hello World deployment for ${{ parameters.serviceName }}
+    #     sourcePath: ./code
+    #     #token: ${{ secrets.USER_OAUTH_TOKEN }}e
+    #     defaultBranch: main
+    #     repoVariables:
+    #       LANGUAGE: python
+    #       SERVICE_NAME: ${{ parameters.serviceName }}
+    #       REGION: ${{ parameters.region }}
+    #       ARTIFACT_REGISTRY_REPO: ${{ parameters.arRepo }}
+    #       ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
+    #       PROJECT_ID: ${{ parameters.gcpProjectId }}
+    #       WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+    #       WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
+    #     secrets:
+    #       WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+    #       WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
+
+    - id: register
+      name: Register Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+###############################################################################
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in Backstage
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
+    text:
+      - title: Next Steps
+        content: |
+          # Welcome to your new Aspect Workflows project! 🎉
+
+          Your repository has been created at: ${{ steps.publish.output.remoteUrl }}
+
+          ## Getting Started
+
+          1. Clone the repository:
+             ```bash
+             git clone ${{ steps.publish.output.remoteUrl }}
+             cd ${{ parameters.name }}
+             ```
+
+          2. Read the developer guide in `/README.bazel.md`
+
+          3. Setup your dev environment:
+             ```bash
+             bazel run //tools:bazel_env
+             ```
+             Note: This requires installing direnv: https://direnv.net/
+
+          4. Try out some commands:
+             - Format: `format`
+             - Lint: `aspect lint //...`
+             - Run tests: `aspect test //...`
+             - Watch mode: `ibazel run //my:devserver`
+
+          5. Add source code and run `bazel run gazelle` to generate BUILD files
+
+          ## Resources
+
+          - 🌟 Star Aspect CLI: https://github.com/aspect-build/aspect-cli
+          - 📚 Documentation: https://docs.aspect.build/
+          - 💬 Join Bazel Slack: https://slack.bazel.build (#aspect-build channel)
