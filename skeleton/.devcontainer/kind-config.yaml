@@ -1,0 +1,41 @@
+# Copyright 2026 MyProject
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# kind cluster configuration optimized for resource-constrained environments
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: local-dev-cluster
+nodes:
+  - role: control-plane
+    # Map localhost ports to the cluster for easy access
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 8443
+        protocol: TCP
+    # Resource constraints for limited environments
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            "max-requests-inflight": "100"
+        controllerManager:
+          extraArgs:
+            "kube-api-burst": "50"
+        scheduler:
+          extraArgs:
+            "kube-api-burst": "50"
